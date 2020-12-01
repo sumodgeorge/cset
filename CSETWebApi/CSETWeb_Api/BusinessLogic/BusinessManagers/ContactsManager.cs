@@ -459,6 +459,12 @@ namespace CSETWeb_Api.BusinessManagers
                 ac.FirstName = u.FirstName;
                 ac.LastName = u.LastName;
 
+                // clean up 'email' if necessary
+                if (ac.PrimaryEmail.EndsWith("@myorg.org"))
+                {
+                    ac.PrimaryEmail = TrimMyOrg(ac.PrimaryEmail);
+                }
+
                 db.ASSESSMENT_CONTACTS.AddOrUpdate( ac, x=> x.Assessment_Contact_Id);
                 db.SaveChanges();
             }
@@ -476,6 +482,24 @@ namespace CSETWeb_Api.BusinessManagers
                             select new { ar.AssessmentRoleId, ar.AssessmentRole };
                 return roles.ToList();
             }
+        }
+
+
+
+        /// <summary>
+        /// Trims the fake "@myorg.org" from an email if present
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public static string TrimMyOrg(string email)
+        {
+            var o = "@myorg.org";
+            if (email.EndsWith(o))
+            {
+                email = email.Substring(0, email.LastIndexOf(o));
+            }
+
+            return email;
         }
     }
 }

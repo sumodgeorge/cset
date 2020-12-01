@@ -92,10 +92,17 @@ namespace CSETWeb_Api.Helpers
 
             String name = WindowsIdentity.GetCurrent().Name;
             name = string.IsNullOrWhiteSpace(name) ? "Local" : name;
-            primaryEmailSO = name + "@myorg.org";
+            primaryEmailSO = name;
+
+            if (string.IsNullOrEmpty(primaryEmailSO))
+            {
+                return null;
+            }
+
             using (var db = new CSET_Context())
             {
-                var user = db.USERS.Where(x => x.PrimaryEmail == primaryEmailSO).FirstOrDefault();
+                var user = db.USERS.Where(x => x.PrimaryEmail == primaryEmailSO || x.PrimaryEmail == (primaryEmailSO + "@myorg.org"))
+                    .FirstOrDefault();
                 if (user == null)
                 {
                     UserManager um = new UserManager();
