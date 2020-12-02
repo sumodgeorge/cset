@@ -25,8 +25,8 @@
   <ng-template #contact_display [ngIf]="editMode">
     <div class="p-3 d-flex flex-column justify-content-center align-items-start flex-11a">
       <span class="m-0 fs-base-1 fw-600">{{contact.FirstName}} {{contact.LastName}}</span>
-      <span class="fs-small fw-400">{{contact.PrimaryEmail}}</span>
-      <span class="fs-small fw-400"> {{contact.AssessmentRole}} </span>
+      <span *ngIf="utilitiesSvc.isValidEmail(contact.PrimaryEmail)" class="fs-small fw-400">{{contact.PrimaryEmail}}</span>
+      <span class="fs-small fw-400">{{contact.AssessmentRole}}</span>
     </div>
     <span *ngIf="showControls()" class="d-flex align-items-center flex-00a">
       <button type="button" class="p-0 m-2 btn icon-button d-flex flex-column align-items-center flex-00a" (click)="editContact()" [disabled]="!enableMyControls">

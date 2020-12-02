@@ -31,6 +31,7 @@ import { AssessmentService, Role } from "../../../../../services/assessment.serv
 import { AuthenticationService } from "../../../../../services/authentication.service";
 import { ConfigService } from "../../../../../services/config.service";
 import { EmailService } from "../../../../../services/email.service";
+import { Utilities } from "../../../../../services/utilities.service";
 
 @Component({
   selector: "app-contact-item",
@@ -68,6 +69,7 @@ export class ContactItemComponent implements OnInit {
     private emailSvc: EmailService,
     public auth: AuthenticationService,
     private assessSvc: AssessmentService,
+    public utilitiesSvc: Utilities,
     private dialog: MatDialog
   ) {
     this.editMode = true;

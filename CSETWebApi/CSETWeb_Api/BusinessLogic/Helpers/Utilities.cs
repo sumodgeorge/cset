@@ -111,6 +111,23 @@ namespace CSETWeb_Api.Helpers
             
             return string.Format("{0} {1}", firstName, lastName);
         }
+
+
+        /// <summary>
+        /// Returns a boolean indicating whether an email is valid.
+        /// </summary>
+        public static bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
 

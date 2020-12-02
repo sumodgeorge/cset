@@ -27,9 +27,9 @@ namespace CSETWeb_Api.Data.ControlData
         private int answer_id = 0;
         private CSET_Context assessmentContext;
 
-        public FindingsViewModel(CSET_Context assessmentContext,int assessment_id, int answer_id)
+        public FindingsViewModel(CSET_Context assessmentContext, int assessment_id, int answer_id)
         {
-            this.assessment_id = assessment_id; 
+            this.assessment_id = assessment_id;
             this.answer_id = answer_id;
             this.assessmentContext = assessmentContext;
             TinyMapper.Bind<FINDING, Finding>();
@@ -56,7 +56,7 @@ namespace CSETWeb_Api.Data.ControlData
 
         public List<Finding> AllFindings()
         {
-            List<Finding> findings = new List<Finding>();            
+            List<Finding> findings = new List<Finding>();
 
             var xxx = assessmentContext.FINDING
                 .Where(x => x.Answer_Id == this.answer_id)
@@ -79,20 +79,26 @@ namespace CSETWeb_Api.Data.ControlData
                         Value = Constants.SAL_LOW
                     };
                 else
-                    webF.Importance = TinyMapper.Map<IMPORTANCE,Importance>(f.Importance_);
+                    webF.Importance = TinyMapper.Map<IMPORTANCE, Importance>(f.Importance_);
 
-                foreach(FINDING_CONTACT fc in f.FINDING_CONTACT)
+                foreach (FINDING_CONTACT fc in f.FINDING_CONTACT)
                 {
                     FindingContact webFc = TinyMapper.Map<FINDING_CONTACT, FindingContact>(fc);
-                    
+
                     webFc.Selected = (fc != null);
                     webF.Finding_Contacts.Add(webFc);
-                }                
+                }
                 findings.Add(webF);
             }
             return findings;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="finding_id"></param>
+        /// <returns></returns>
         public Finding GetFinding(int finding_id)
         {
             Finding webF;
@@ -104,15 +110,19 @@ namespace CSETWeb_Api.Data.ControlData
                     .FirstOrDefault();
 
                 var q = assessmentContext.ANSWER.Where(x => x.Answer_Id == this.answer_id).FirstOrDefault();
-                
+
                 webF = TinyMapper.Map<Finding>(f);
                 webF.Question_Id = q != null ? q.Question_Or_Requirement_Id : 0;
                 webF.Finding_Contacts = new List<FindingContact>();
                 foreach (var contact in assessmentContext.ASSESSMENT_CONTACTS.Where(x => x.Assessment_Id == assessment_id))
                 {
                     FindingContact webContact = TinyMapper.Map<FindingContact>(contact);
-                    webContact.Name = contact.PrimaryEmail + " -- " + contact.FirstName + " " + contact.LastName;
-                    webContact.Selected = (f.FINDING_CONTACT.Where(x=> x.Assessment_Contact_Id == contact.Assessment_Contact_Id).FirstOrDefault()!=null);
+                    webContact.Name = contact.FirstName + " " + contact.LastName;
+                    if (CSETWeb_Api.Helpers.Utilities.IsValidEmail(contact.PrimaryEmail))
+                    {
+                        webContact.Name = contact.PrimaryEmail + " -- " + webContact.Name;
+                    }
+                    webContact.Selected = (f.FINDING_CONTACT.Where(x => x.Assessment_Contact_Id == contact.Assessment_Contact_Id).FirstOrDefault() != null);
                     webF.Finding_Contacts.Add(webContact);
                 }
             }
@@ -134,7 +144,11 @@ namespace CSETWeb_Api.Data.ControlData
                 {
                     FindingContact webContact = TinyMapper.Map<FindingContact>(contact);
                     webContact.Finding_Id = f.Finding_Id;
-                    webContact.Name = contact.PrimaryEmail + " -- " + contact.FirstName + " " + contact.LastName;
+                    webContact.Name = contact.FirstName + " " + contact.LastName;
+                    if (CSETWeb_Api.Helpers.Utilities.IsValidEmail(contact.PrimaryEmail))
+                    {
+                        webContact.Name = contact.PrimaryEmail + " -- " + webContact.Name;
+                    }
                     webContact.Selected = false;
                     webF.Finding_Contacts.Add(webContact);
                 }
@@ -177,7 +191,8 @@ namespace CSETWeb_Api.Data.ControlData
         }
     }
 
-    public class FindingContact{
+    public class FindingContact
+    {
         public int Finding_Id { get; set; }
         public int Assessment_Contact_Id { get; set; }
 

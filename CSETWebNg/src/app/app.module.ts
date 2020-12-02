@@ -231,6 +231,7 @@ import { NavBackNextComponent } from './assessment/navigation/nav-back-next/nav-
 import { CsetOriginComponent } from './initial/cset-origin/cset-origin.component';
 import { ComplianceScoreComponent } from './assessment/results/mat-cmmc/chart-components/compliance-score/compliance-score.component';
 import { CmmcStyleService } from './services/cmmc-style.service';
+import { Utilities } from './services/utilities.service';
 
 @NgModule({
     imports: [
@@ -463,7 +464,8 @@ import { CmmcStyleService } from './services/cmmc-style.service';
         ReportService,
         ReportAnalysisService, 
         LocalStoreManager,
-        CmmcStyleService
+        CmmcStyleService,
+        Utilities
     ],
     bootstrap: [AppComponent],
     entryComponents: [
