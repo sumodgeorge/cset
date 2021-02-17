@@ -1,6 +1,6 @@
 ////////////////////////////////
 //
-//   Copyright 2020 Battelle Energy Alliance, LLC
+//   Copyright 2021 Battelle Energy Alliance, LLC
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@ export class CmmcGapsComponent implements OnInit {
 
         if (r.MaturityModels) {
           r.MaturityModels.forEach(model => {
-            if (model.MaturityModelName == "CMMC") {
+            if (model.MaturityModelName === 'CMMC') {
               this.cmmcModel = model
               this.statsByLevel = this.generateStatsByLevel(this.cmmcModel.StatsByLevel)
               this.statsByDomain = this.cmmcModel.StatsByDomain

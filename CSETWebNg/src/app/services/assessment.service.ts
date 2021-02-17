@@ -1,6 +1,6 @@
 ////////////////////////////////
 //
-//   Copyright 2020 Battelle Energy Alliance, LLC
+//   Copyright 2021 Battelle Energy Alliance, LLC
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,10 @@ import { User } from '../models/user.model';
 import { ConfigService } from './config.service';
 import { Router } from '@angular/router';
 import { EmailService } from './email.service';
+import { config } from 'rxjs';
+import { MaturityService } from './maturity.service';
+
+
 
 export interface Role {
   AssessmentRoleId: number;
@@ -52,8 +56,11 @@ export class AssessmentService {
   private initialized = false;
   public applicationMode: string;
 
+  /**
+   * This is private because we need a setter so that we can do things
+   * when the assessment is loaded.
+   */
   public assessment: AssessmentDetail;
-
 
   /**
    * Stores the active assessment 'features' that the user wishes to use,
@@ -61,14 +68,18 @@ export class AssessmentService {
    */
   public assessmentFeatures: any[] = [];
 
-  public maturityModels: string[] = [];
 
+  /**
+   * Indicates if a brand-new assessment is being created.
+   * This will allow the assessment-detail page to do certain
+   * things that should only be done on the very first load of an assessment.
+   */
+  public isBrandNew = false;
 
   /**
    *
    */
   constructor(
-    private emailSvc: EmailService,
     private http: HttpClient,
     private configSvc: ConfigService,
     private router: Router
@@ -81,6 +92,9 @@ export class AssessmentService {
     }
   }
 
+  /**
+   * 
+   */
   dropAssessment() {
     this.userRoleId = undefined;
     this.currentTab = undefined;
@@ -89,18 +103,27 @@ export class AssessmentService {
     sessionStorage.removeItem('assessmentId');
   }
 
+  /**
+   * 
+   */
   refreshRoles() {
     return this.http.get(this.apiUrl + 'contacts/allroles');
   }
 
-  createAssessment() {
-    return this.http.get(this.apiUrl + 'createassessment');
+  createAssessment(mode) {
+    return this.http.get(this.apiUrl + 'createassessment?mode=' + mode);
   }
 
+  /**
+   * 
+   */
   getAssessments() {
     return this.http.get(this.apiUrl + 'assessmentsforuser');
   }
 
+  /**
+   * 
+   */
   getAssessmentToken(assessId: number) {
     return this.http
       .get(this.apiUrl + 'auth/token?assessmentId=' + assessId)
@@ -118,10 +141,16 @@ export class AssessmentService {
       });
   }
 
+  /**
+   * 
+   */
   getAssessmentDetail() {
     return this.http.get(this.apiUrl + 'assessmentdetail');
   }
 
+  /**
+   * 
+   */
   updateAssessmentDetails(assessment: AssessmentDetail) {
     this.assessment = assessment;
     return this.http
@@ -133,6 +162,9 @@ export class AssessmentService {
       .subscribe();
   }
 
+  /**
+   * 
+   */
   getAssessmentContacts() {
     return this.http
       .get(this.apiUrl + 'contacts')
@@ -143,6 +175,16 @@ export class AssessmentService {
       });
   }
 
+  /**
+   * 
+   */
+  getOrganizationTypes() {
+    return this.http.get(this.apiUrl + 'getOrganizationTypes');
+  }
+
+  /**
+   * 
+   */
   searchContacts(term: User) {
     return this.http.post(
       this.apiUrl + 'contacts/search',
@@ -151,6 +193,9 @@ export class AssessmentService {
     );
   }
 
+  /**
+   * 
+   */
   createContact(contact: User) {
     const body = this.configSvc.config.defaultInviteTemplate;
     return this.http.post(
@@ -167,6 +212,9 @@ export class AssessmentService {
     );
   }
 
+  /**
+   * 
+   */
   updateContact(contact: User): any {
     return this.http.post(
       this.apiUrl + 'contacts/UpdateUser',
@@ -175,6 +223,9 @@ export class AssessmentService {
     );
   }
 
+  /**
+   * 
+   */
   addContact(contact: User) {
     return this.http.post(
       this.apiUrl + 'contacts/add',
@@ -186,10 +237,24 @@ export class AssessmentService {
     );
   }
 
-  removeContact(userId: number, assessment_id: number) {
+  /**
+   * Disconnects the current user from an assessment.
+   */
+  removeMyContact(assessment_id: number) {
     return this.http.post(
       this.apiUrl + 'contacts/remove',
-      { UserId: userId, Assessment_ID: assessment_id },
+      { AssessmentId: assessment_id },
+      headers
+    );
+  }
+
+  /**
+   * Requests removing a user from an assessment.
+   */
+  removeContact(assessmentContactId: number) {
+    return this.http.post(
+      this.apiUrl + 'contacts/remove',
+      { AssessmentContactId: assessmentContactId },
       headers
     );
   }
@@ -206,21 +271,36 @@ export class AssessmentService {
     );
   }
 
+  /**
+   * 
+   */
   id(): number {
     return +sessionStorage.getItem('assessmentId');
   }
 
+  /**
+   * 
+   */
   getMode() {
     this.http
       .get(this.apiUrl + 'GetMode')
       .subscribe((mode: string) => (this.applicationMode = mode));
   }
 
+  /**
+   * Create a new assessment.
+   */
   newAssessment() {
-    this.createAssessment()
+    let mode = this.configSvc.acetInstallation;
+    this.createAssessment(mode)
       .toPromise()
       .then(
-        (response: any) => this.loadAssessment(response.Id),
+        (response: any) => {
+          // set the brand new flag
+          this.isBrandNew = true;
+
+          this.loadAssessment(response.Id);
+        },
         error =>
           console.log(
             'Unable to create new assessment: ' + (<Error>error).message
@@ -228,23 +308,53 @@ export class AssessmentService {
       );
   }
 
+  /**
+   * 
+   */
   loadAssessment(id: number) {
     this.getAssessmentToken(id).then(() => {
-      const rpath = localStorage.getItem('returnPath');
-      if (rpath != null) {
-        localStorage.removeItem('returnPath');
-        const returnPath = '/assessment/' + id + '/' + rpath;
-        this.router.navigate([returnPath], { queryParamsHandling: 'preserve' });
-      } else {
-        this.router.navigate(['/assessment', id]);
-      }
+
+      this.getAssessmentDetail().subscribe(data => {
+        this.assessment = data;
+
+        const rpath = localStorage.getItem('returnPath');
+        if (rpath != null) {
+          localStorage.removeItem('returnPath');
+          const returnPath = '/assessment/' + id + '/' + rpath;
+          this.router.navigate([returnPath], { queryParamsHandling: 'preserve' });
+        } else {
+          this.router.navigate(['/assessment', id]);
+        }
+      });
     });
   }
 
+  /**
+   * Reset things to ACET defaults
+   */
+  setAcetDefaults() {
+    if (!!this.assessment) {
+      this.assessment.UseMaturity = true;
+      this.assessment.MaturityModel = MaturityService.allMaturityModels.find(m => m.ModelName == 'ACET');
+      this.assessment.IsAcetOnly = true;
+
+      this.assessment.UseStandard = false;
+
+      this.updateAssessmentDetails(this.assessment);
+    }
+  }
+
+
+  /**
+   * 
+   */
   getAssessmentDocuments() {
     return this.http.get(this.apiUrl + 'assessmentdocuments');
   }
 
+  /**
+   * 
+   */
   hasDiagram() {
     return this.http.get(this.apiUrl + 'diagram/has');
   }
@@ -268,6 +378,37 @@ export class AssessmentService {
     } else {
       this.assessmentFeatures = this.assessmentFeatures.filter(x => x !== feature);
     }
+  }
+
+  /**
+   * Indicates if the assessment uses a maturity model.
+   */
+  usesMaturityModel(modelName: string) {
+    if (!this.assessment) {
+      return false;
+    }
+
+    if (!this.assessment.MaturityModel) {
+      return false;
+    }
+
+    if (!this.assessment.MaturityModel.ModelName) {
+      return false;
+    }
+
+    if (modelName == '*' && !!this.assessment.MaturityModel.ModelName) {
+      return true;
+    }
+
+    return this.assessment.MaturityModel.ModelName.toLowerCase() === modelName.toLowerCase();
+  }
+
+  /**
+   * Sets the maturity model name on the assessment
+   * @param modelName 
+   */
+  setModel(modelName: string) {
+    this.assessment.MaturityModel = MaturityService.allMaturityModels.find(m => m.ModelName == modelName);
   }
 
   /**
