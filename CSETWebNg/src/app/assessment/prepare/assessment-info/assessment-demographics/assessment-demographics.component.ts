@@ -21,10 +21,10 @@
 //  SOFTWARE.
 //
 ////////////////////////////////
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Demographic } from '../../../../models/assessment-info.model';
 import { DemographicService } from '../../../../services/demographic.service';
-import { AssessmentService } from '../../../../services/assessment.service'; 
+import { AssessmentService } from '../../../../services/assessment.service';
 import { AssessmentContactsResponse } from "../../../../models/assessment-info.model";
 import { User } from '../../../../models/user.model';
 
@@ -67,7 +67,11 @@ export class AssessmentDemographicsComponent implements OnInit {
     demographicData: Demographic = {};
     orgTypes: any[];
 
-    constructor(private demoSvc: DemographicService, public assessSvc: AssessmentService) { }
+    constructor(
+        private demoSvc: DemographicService,
+        public assessSvc: AssessmentService,
+        public cd: ChangeDetectorRef
+    ) { }
 
     ngOnInit() {
         this.demoSvc.getAllSectors().subscribe(
@@ -102,6 +106,10 @@ export class AssessmentDemographicsComponent implements OnInit {
         this.getOrganizationTypes();
     }
 
+    ngAfterContentChecked() {
+        this.cd.detectChanges();
+    }
+
     onSelectSector(sectorId: number) {
         this.populateIndustryOptions(sectorId);
         // invalidate the current Industry, as the Sector list has just changed
@@ -121,7 +129,7 @@ export class AssessmentDemographicsComponent implements OnInit {
         );
     }
 
-    getOrganizationTypes(){
+    getOrganizationTypes() {
         this.assessSvc.getOrganizationTypes().subscribe(
             (data: any) => {
                 this.orgTypes = data;
@@ -129,14 +137,18 @@ export class AssessmentDemographicsComponent implements OnInit {
         )
     }
 
-    refreshContacts(){
+    refreshContacts() {
         if (this.assessSvc.id()) {
             this.assessSvc
-              .getAssessmentContacts()
-              .then((data: AssessmentContactsResponse) => {
-                this.contacts = data.ContactList;
-              });
-          }
+                .getAssessmentContacts()
+                .then((data: AssessmentContactsResponse) => {
+                    this.contacts = data.ContactList;
+
+                    console.log('assessment_demog');
+                    console.log(this.contacts);
+                    console.log(this.demographicData);
+                });
+        }
     }
 
     populateIndustryOptions(sectorId: number) {
@@ -158,32 +170,32 @@ export class AssessmentDemographicsComponent implements OnInit {
         this.updateDemographics();
     }
 
-    changeOrgType(event: any){
+    changeOrgType(event: any) {
         this.demographicData.OrganizationType = event.target.value;
         this.updateDemographics();
     }
 
-    changeFacilitator(event: any){
-        this.demographicData.Facilitator = event.target.value;
+    changeFacilitator(event: any) {
+        this.demographicData.Facilitator = Number.parseInt(event.target.value);
         this.updateDemographics();
     }
 
-    changeOrgName(event: any){
+    changeOrgName(event: any) {
         this.demographicData.OrganizationName = event.target.value;
         this.updateDemographics();
     }
 
-    changeAgency(event: any){
+    changeAgency(event: any) {
         this.demographicData.Agency = event.target.value;
         this.updateDemographics();
     }
 
-    changePointOfContact(event: any){
-        this.demographicData.PointOfContact = event.target.value;
+    changePointOfContact(event: any) {
+        this.demographicData.PointOfContact = Number.parseInt(event.target.value);
         this.updateDemographics();
     }
 
-    changeIsScoped(event: any){
+    changeIsScoped(event: any) {
         //this.demographicData.IsScoped = event.target.value;
         this.updateDemographics();
     }

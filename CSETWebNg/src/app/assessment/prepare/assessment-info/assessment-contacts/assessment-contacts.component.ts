@@ -209,6 +209,7 @@ export class AssessmentContactsComponent implements OnInit {
   editContact(contact: User) {
     this.assessSvc.updateContact(contact).subscribe(() => {
       this.contactItems.forEach(x => x.enableMyControls = true);
+      this.changeOccurred();
     });
   }
 

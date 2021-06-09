@@ -276,8 +276,8 @@ namespace CSETWeb_Api.BusinessLogic
                 }
                 catch (Exception exc)
                 {
-                    CsetLogManager.Instance.LogErrorMessage("Exception thrown in NotificationManager.SendMail(): {0}", exc.ToString());
-                    throw exc;
+                    // CsetLogManager.Instance.LogErrorMessage("Exception thrown in NotificationManager.SendMail(): {0}", exc.ToString());
+                    // throw exc;
                 }
             });
         }
