@@ -43,5 +43,14 @@ namespace DataLayerCore.Manual
         public int? Percent { get; set; }        
     }
 
-    
+    public class usp_getRRAQuestionsDetails
+    {      
+        public int Assessment_Id { get; set; }
+        public string question_title { get; set; }
+        public string Question_text { get; set; }
+        public string Answer_Text { get; set; }
+    }
+
+
+
 }

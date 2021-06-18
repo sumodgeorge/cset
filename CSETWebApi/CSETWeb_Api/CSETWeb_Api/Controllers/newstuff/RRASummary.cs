@@ -77,5 +77,17 @@ namespace CSETWeb_Api.Controllers
             return results;
         }
 
+        internal List<usp_getRRAQuestionsDetails> getRRAQuestions(CSET_Context context, int assessmentId)
+        {
+            List<usp_getRRAQuestionsDetails> results = null;
+
+            context.LoadStoredProc("[usp_getRRAQuestionsDetails]")
+            .WithSqlParam("assessment_id", assessmentId)
+            .ExecuteStoredProc((handler) =>
+            {
+                results = handler.ReadToList<usp_getRRAQuestionsDetails>().ToList();
+            });
+            return results;
+        }
     }
 }
