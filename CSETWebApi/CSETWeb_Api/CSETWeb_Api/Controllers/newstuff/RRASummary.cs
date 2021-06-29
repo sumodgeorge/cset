@@ -77,6 +77,7 @@ namespace CSETWeb_Api.Controllers
             return results;
         }
 
+<<<<<<< HEAD
         internal List<usp_getRRAQuestionsDetails> getRRAQuestions(CSET_Context context, int assessmentId)
         {
             List<usp_getRRAQuestionsDetails> results = null;
@@ -87,6 +88,16 @@ namespace CSETWeb_Api.Controllers
             {
                 results = handler.ReadToList<usp_getRRAQuestionsDetails>().ToList();
             });
+=======
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal List<string> GetQuestions(CSET_Context context, int assessmentId)
+        {
+            List<string> results = new List<string>();
+>>>>>>> 96a0d77c61a95ce68a0c8cccff3d163d2bf878e9
             return results;
         }
     }
