@@ -52,6 +52,8 @@ namespace DataLayerCore.Manual
         public string question_title { get; set; }
         public string Question_text { get; set; }
         public string Answer_Text { get; set; }
+        public int? Total { get; set; }
+        public String Title { get; set; }
     }
 
 

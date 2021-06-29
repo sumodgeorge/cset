@@ -106,7 +106,9 @@ namespace CSETWeb_Api.Controllers
                 data.RRASummary = summary.getRRASummary(context, assessmentId);
                 data.RRASummaryByGoal = summary.getRRASummaryByGoal(context, assessmentId);
                 data.RRASummaryByGoalOverall = summary.getRRASummaryByGoalOverall(context, assessmentId);
-                data.RRAQuestions = summary.getRRAQuestions(context, assessmentId);
+                var questions = summary.getRRAQuestions(context, assessmentId);
+                data.RRAQuestions = summary.ProcessStructure(questions, data.RRASummaryByGoal, data.RRASummaryByGoalOverall);
+
                 return data;
             }
         }

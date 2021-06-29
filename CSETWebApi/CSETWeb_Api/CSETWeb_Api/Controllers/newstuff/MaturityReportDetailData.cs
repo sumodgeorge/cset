@@ -5,6 +5,7 @@
 // 
 //////////////////////////////// 
 using CSETWeb_Api.BusinessManagers.Analysis;
+using CSETWeb_Api.Controllers.newstuff;
 using DataLayerCore.Manual;
 using System.Collections.Generic;
 
@@ -16,6 +17,6 @@ namespace CSETWeb_Api.Controllers
         public List<usp_getRRASummary> RRASummary { get; set; }
         public List<usp_getRRASummaryByGoal> RRASummaryByGoal { get; set; }
         public List<usp_getRRASummaryByGoalOverall> RRASummaryByGoalOverall { get; set; }
-        public List<usp_getRRAQuestionsDetails> RRAQuestions { get; set; }
+        public Dictionary<string, RRAQuestions> RRAQuestions { get; set; }
     }
 }

@@ -8010,6 +8010,7 @@
     <Compile Include="Controllers\IRP2Controller.cs" />
     <Compile Include="Controllers\MaturityController.cs" />
     <Compile Include="Controllers\newstuff\MaturityReportDetailData.cs" />
+    <Compile Include="Controllers\newstuff\RRAQuestions.cs" />
     <Compile Include="Controllers\ProtectedFeatureController.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\ReferenceDocumentsController.cs" />
