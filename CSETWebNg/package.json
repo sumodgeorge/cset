@@ -24,7 +24,7 @@
     "@angular/animations": "^13.1.1",
     "@angular/cdk": "^13.0.0",
     "@angular/cli": "^13.1.2",
-    "@angular/common": "^13.1.1",
+    "@angular/common": "^19.2.16",
     "@angular/compiler": "^13.1.1",
     "@angular/core": "^13.1.1",
     "@angular/elements": "^13.1.1",
@@ -89,7 +89,7 @@
     "typescript-string-operations": "^1.4.1",
     "universal-analytics": "^0.4.23",
     "update": "^0.7.4",
-    "webpack-dev-server": "^4.4.0",
+    "webpack-dev-server": "^4.7.3",
     "xlsx": "^0.16.9",
     "zone.js": "^0.11.4"
   },
